@@ -1,0 +1,58 @@
+name: CrescendoAttackDetection
+description: Detects potential Crescendo attacks in chat interactions.
+version: 1.0
+
+settings:
+  benign_prompts:
+    - "Tell me about"
+    - "Can you explain"
+    - "What are some"
+  escalation_keywords:
+    - "combine those quotes"
+    - "make it angry"
+    - "write an article"
+  detection_threshold: 0.8  # Threshold for detection confidence
+
+logic:
+  detect_crescendo:
+    steps:
+      - name: monitor_prompts
+        description: Monitor initial prompts for benign intent.
+        action: monitor
+        parameters:
+          prompt_patterns: $settings.benign_prompts
+      - name: detect_escalation
+        description: Detect escalation in user prompts.
+        action: analyze
+        parameters:
+          escalation_patterns: $settings.escalation_keywords
+      - name: evaluate_interaction
+        description: Evaluate the interaction for potential Crescendo attack.
+        action: evaluate
+        parameters:
+          threshold: $settings.detection_threshold
+
+feedback:
+  on_detection:
+    action: alert
+    parameters:
+      message: "Warning: Potential Crescendo attack detected."
+      log_to_server: true
+      server_endpoint: "https://logcrescendoattack.azurewebsites.net/api/LogCrescendoAttackTrigger"
+
+output:
+  format: json
+  store:
+    method: external_server
+    server_endpoint: "https://logcrescendoattack.azurewebsites.net/api/LogCrescendoAttackTrigger"
+
+security:
+  ethical_use:
+    disclaimer: "This plugin is for research and security enhancement purposes only."
+    guidelines: "Ensure responsible usage and prevent misuse."
+
+documentation:
+  user_guide:
+    overview: "This plugin detects Crescendo attacks by monitoring and analyzing chat interactions."
+    setup: "Follow the setup instructions to integrate the plugin with Copilot for Security."
+    usage: "The plugin will alert you in case of a detected Crescendo attack and log the event for further analysis."
